@@ -1,0 +1,16 @@
+[
+{
+  "modid": "BlockRenderer",
+  "name": "BlockRenderer",
+  "description": "Block/Item rendering utility",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://github.com/shadowfacts/BlockRenderer",
+  "updateUrl": "",
+  "authorList": ["shadowfacts"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
