@@ -1,54 +1,52 @@
 package net.shadowfacts.blockrenderer;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.shadowfacts.shadowmc.gui.component.GUIComponentTextField;
-import net.shadowfacts.shadowmc.gui.component.button.GUIButtonText;
-import net.shadowfacts.shadowmc.gui.handler.ExitWindowKeyHandler;
-import net.shadowfacts.shadowmc.gui.mcwrapper.GuiScreenWrapper;
-import net.shadowfacts.shadowmc.gui.mcwrapper.MCBaseGUI;
-import net.shadowfacts.shadowmc.util.MouseButton;
+import net.shadowfacts.shadowmc.ui.UIKeyInteractable;
+import net.shadowfacts.shadowmc.ui.element.button.UIButtonText;
+import net.shadowfacts.shadowmc.ui.element.textfield.UITextField;
+import net.shadowfacts.shadowmc.ui.element.view.UIStackView;
+import net.shadowfacts.shadowmc.ui.style.UIAttribute;
+import net.shadowfacts.shadowmc.ui.style.UIVerticalLayoutMode;
+import net.shadowfacts.shadowmc.ui.util.UIBuilder;
 import org.lwjgl.input.Keyboard;
 
 /**
  * @author shadowfacts
  */
-public class GUIEnterModID extends MCBaseGUI {
-
-	private GuiScreen parent;
-
-	private GUIComponentTextField field;
-
-	public GUIEnterModID(GuiScreenWrapper wrapper, GuiScreen parent) {
-		super(wrapper);
-		this.parent = parent;
-
-		field = addChild(new GUIComponentTextField(0, 0, 200, 20, s -> {}));
-		addChild(new GUIButtonText(0, 30, 100, 20, this::onRender, "Render"));
-		addChild(new GUIButtonText(0, 60, 100, 20, this::onCancel, "Cancel"));
-
-		keyHandlers.clear();
-		keyHandlers.add(new ExitWindowKeyHandler(Keyboard.KEY_ESCAPE));
-	}
-
-	private boolean onRender(GUIButtonText button, MouseButton mouseButton) {
-		if (mc.theWorld != null) {
-			BlockRenderer.pendingBulkRender = field.getText();
-		}
-		mc.displayGuiScreen(parent);
-		return true;
-	}
-
-	private boolean onCancel(GUIButtonText button, MouseButton mouseButton) {
-		mc.displayGuiScreen(parent);
-		return true;
-	}
+public class GUIEnterModID {
 
 	public static GuiScreen create(GuiScreen parent) {
-		GuiScreenWrapper wrapper = new GuiScreenWrapper();
-		GUIEnterModID gui = new GUIEnterModID(wrapper, parent);
-		wrapper.gui = gui;
-		gui.setZLevel(0);
-		return wrapper;
+
+		UIStackView stack = new UIStackView("stack");
+		stack.setStyle(UIAttribute.VERTICAL_LAYOUT, UIVerticalLayoutMode.TOP);
+		stack.setStyle(UIAttribute.STACK_SPACING, 10);
+		stack.setStyle(UIAttribute.MARGIN_TOP, 10);
+
+		UITextField textField = new UITextField(s -> {}, "textField");
+		stack.add(textField);
+
+		UIButtonText render = new UIButtonText("Render", (btn, mouseBtn) -> {
+			if (Minecraft.getMinecraft().theWorld != null) {
+				BlockRenderer.pendingBulkRender = textField.getText();
+			}
+			Minecraft.getMinecraft().displayGuiScreen(parent);
+			return true;
+		}, "render");
+		stack.add(render);
+
+		UIButtonText cancel = new UIButtonText("Cancel", (btn, mouseBtn) -> {
+			Minecraft.getMinecraft().displayGuiScreen(parent);
+			return true;
+		}, "cancel");
+		stack.add(cancel);
+
+
+		UIKeyInteractable handler = (keyCode, keyChar) -> {
+			if (keyCode == Keyboard.KEY_ESCAPE) Minecraft.getMinecraft().displayGuiScreen(parent);
+		};
+
+		return new UIBuilder().add(stack).clearKeyHandlers().addKeyHandler(handler).createScreen();
 	}
 
 }

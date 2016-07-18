@@ -36,7 +36,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.nio.ByteBuffer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -46,7 +45,7 @@ import java.util.List;
 /**
  * @author shadowfacts
  */
-@Mod(modid = BlockRenderer.modId, name = BlockRenderer.name, version = BlockRenderer.version, dependencies = "required-after:shadowmc;", acceptedMinecraftVersions = "[1.9.4]")
+@Mod(modid = BlockRenderer.modId, name = BlockRenderer.name, version = BlockRenderer.version, dependencies = "required-after:shadowmc@[3.4.2,);", acceptedMinecraftVersions = "[1.10.2]")
 public class BlockRenderer {
 
 	public static final String modId = "BlockRenderer";
