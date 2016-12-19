@@ -27,7 +27,7 @@ public class GUIEnterModID {
 		stack.add(textField);
 
 		UIButtonText render = new UIButtonText("Render", (btn, mouseBtn) -> {
-			if (Minecraft.getMinecraft().theWorld != null) {
+			if (Minecraft.getMinecraft().world != null) {
 				BlockRenderer.pendingBulkRender = textField.getText();
 			}
 			Minecraft.getMinecraft().displayGuiScreen(parent);

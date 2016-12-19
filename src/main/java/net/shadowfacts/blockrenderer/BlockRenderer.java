@@ -15,6 +15,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
@@ -45,10 +46,10 @@ import java.util.List;
 /**
  * @author shadowfacts
  */
-@Mod(modid = BlockRenderer.modId, name = BlockRenderer.name, version = BlockRenderer.version, dependencies = "required-after:shadowmc@[3.4.2,);", acceptedMinecraftVersions = "[1.10.2]")
+@Mod(modid = BlockRenderer.modId, name = BlockRenderer.name, version = BlockRenderer.version, dependencies = "required-after:shadowmc@[3.4.2,);")
 public class BlockRenderer {
 
-	public static final String modId = "BlockRenderer";
+	public static final String modId = "blockrenderer";
 	public static final String name = "Block Renderer";
 	public static final String version = "@VERSION@";
 
@@ -104,7 +105,7 @@ public class BlockRenderer {
 			modids.add(s.trim());
 		}
 		List<ItemStack> toRender = new ArrayList<>();
-		List<ItemStack> li = new ArrayList<>();
+		NonNullList<ItemStack> li = NonNullList.create();
 		int rendered = 0;
 		for (ResourceLocation id : Item.REGISTRY.getKeys()) {
 			if (id != null && modids.contains(id.getResourceDomain()) || modids.contains("*")) {
@@ -113,9 +114,13 @@ public class BlockRenderer {
 				try {
 					i.getSubItems(i, i.getCreativeTab(), li);
 				} catch (Throwable t) {
+					System.err.println("Unable to get sub items for " + id);
 					t.printStackTrace();
 				}
-				toRender.addAll(li);
+				li.stream()
+						.filter(it -> it != null)
+						.filter(it -> !it.isEmpty())
+						.forEach(toRender::add);
 			}
 		}
 		File folder = new File("renders/" + dateFormat.format(new Date()) + "/");
@@ -183,11 +188,11 @@ public class BlockRenderer {
 			File f = new File(folder, "sheet.png");
 			ImageIO.write(result, "PNG", f);
 
-			Minecraft.getMinecraft().thePlayer.addChatMessage(new TextComponentTranslation("msg.stitcher.success", f.getPath()));
+			Minecraft.getMinecraft().player.sendMessage(new TextComponentTranslation("msg.stitcher.success", f.getPath()));
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			Minecraft.getMinecraft().thePlayer.addChatMessage(new TextComponentTranslation("msg.stitcher.fail"));
+			Minecraft.getMinecraft().player.sendMessage(new TextComponentTranslation("msg.stitcher.fail"));
 		}
 	}
 
@@ -217,10 +222,10 @@ public class BlockRenderer {
 			File minSheet = new File(folder, "sheet-min.json");
 			Files.write(json.getBytes(), sheet);
 			Files.write(minJson.getBytes(), minSheet);
-			Minecraft.getMinecraft().thePlayer.addChatMessage(new TextComponentTranslation("msg.stitcher.json.success", sheet.getPath()));
+			Minecraft.getMinecraft().player.sendMessage(new TextComponentTranslation("msg.stitcher.json.success", sheet.getPath()));
 		} catch (IOException e) {
 			e.printStackTrace();
-			Minecraft.getMinecraft().thePlayer.addChatMessage(new TextComponentTranslation("msg.stitcher.json.fail"));
+			Minecraft.getMinecraft().player.sendMessage(new TextComponentTranslation("msg.stitcher.json.fail"));
 		}
 	}
 
@@ -241,7 +246,7 @@ public class BlockRenderer {
 		// ...and draw the tooltip.
 		if (is != null) {
 			try {
-				List<String> list = is.getTooltip(mc.thePlayer, true);
+				List<String> list = is.getTooltip(mc.player, true);
 
 				// This code is copied from the tooltip renderer, so we can properly center it.
 				for (int i = 0; i < list.size(); ++i) {
